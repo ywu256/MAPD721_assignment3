@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,8 +18,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,10 +66,53 @@ fun MainScreen(navController: NavController) {
 }
 
 @Composable
+fun AnimatedContentScreen() {
+    var isVisible by remember { mutableStateOf(true) }
+
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(onClick = { isVisible = !isVisible }) {
+            Text("Toggle Content")
+        }
+
+        AnimatedContent(targetState = isVisible, label = "AnimatedContent") { target ->
+            if (target) {
+                Text(text = "Hello, Compose!", fontSize = 24.sp, color = Color.Blue)
+            } else {
+                Text(text = "Goodbye, Compose!", fontSize = 24.sp, color = Color.Red)
+            }
+        }
+    }
+}
+
+@Composable
+fun ValueBasedAnimationScreen1() {
+    var visible by remember { mutableStateOf(true) }
+
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(onClick = { visible = !visible }) {
+            Text("Toggle Animation")
+        }
+
+        AnimatedVisibility(visible = visible) {
+            Text(
+                text = "Fading In & Out!",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .background(Color.Cyan)
+                    .padding(16.dp)
+                    .animateContentSize()
+            )
+        }
+    }
+}
+
+@Composable
 fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "mainScreen") {
         composable("mainScreen") { MainScreen(navController) }
+        composable("screen1") { AnimatedContentScreen() }
+        composable("screen2") { ValueBasedAnimationScreen1() }
     }
 }
 
